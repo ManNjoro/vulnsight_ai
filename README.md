@@ -40,25 +40,27 @@ This tool ranks vulnerabilities by predicted exploitation risk so that high-impa
 
 The training data is created by merging:
 
-NVD (National Vulnerability Database)
+- NVD (National Vulnerability Database)
 
-CISA Known Exploited Vulnerabilities (KEV)
+- CISA Known Exploited Vulnerabilities (KEV)
 
-EPSS (Exploit Prediction Scoring System)
+- EPSS (Exploit Prediction Scoring System)
 
 ## Model
 
 **Algorithm:** XGBoost Classifier
+
 **Goal:** Predict real-world exploitation of vulnerabilities.
+
 **Key metrics:**
 
-- - ROC-AUC: 0.968
+- ROC-AUC: 0.968
 
-- - Recall (exploited class): 0.83
+- Recall (exploited class): 0.83
 
-- - Precision (exploited class): expectedly low due to heavy class imbalance
+- Precision (exploited class): expectedly low due to heavy class imbalance
 
-- - Excellent ranking performance for top high-risk CVEs
+- Excellent ranking performance for top high-risk CVEs
 
 Random Forest was also tested; XGBoost performed slightly better.
 
