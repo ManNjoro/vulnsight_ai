@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import PredictionResultsSerializer
 from .predict import run_prediction
-from rest_framework.pagination import PageNumberPagination
+from .pagination import ResultsPagination
 
 # Create your views here.
 
@@ -13,7 +13,7 @@ from .utils import parse_uploaded_file
 
 class PredictionResultsView(APIView):
     serializer_class = PredictionResultsSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = ResultsPagination
 
     def post(self, request):
         try:
@@ -22,30 +22,23 @@ class PredictionResultsView(APIView):
 
             uploaded_file = serializer.validated_data["file"]
 
-            # Parse file
             df = parse_uploaded_file(uploaded_file)
-            print(df.head())
 
-            
             preds, probs = run_prediction(df)
 
             df["prediction"] = preds
             df["risk_probability"] = probs
 
-            # Format response
             results = df[["cve_id", "prediction", "risk_probability"]].to_dict(
                 orient="records"
             )
 
-            return Response(
-                {
-                    "success": True,
-                    "total_items": len(results),
-                    "results": results,
-                },
-                status=status.HTTP_200_OK
-            )
+            # APPLY PAGINATION HERE
+            paginator = self.pagination_class()
+            paginated_page = paginator.paginate_queryset(results, request)
+
+            return paginator.get_paginated_response(paginated_page)
 
         except Exception as e:
-            return Response({"error": str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
