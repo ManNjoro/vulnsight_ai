@@ -4,6 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import PredictionResultsSerializer
+from .predict import run_prediction
+from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 
@@ -11,6 +13,7 @@ from .utils import parse_uploaded_file
 
 class PredictionResultsView(APIView):
     serializer_class = PredictionResultsSerializer
+    pagination_class = PageNumberPagination
 
     def post(self, request):
         try:
@@ -21,13 +24,25 @@ class PredictionResultsView(APIView):
 
             # Parse file
             df = parse_uploaded_file(uploaded_file)
+            print(df.head())
 
-            # (Optional) Next Step → Run predictions
-            # preds = model.predict(df)
+            
+            preds, probs = run_prediction(df)
+
+            df["prediction"] = preds
+            df["risk_probability"] = probs
+
+            # Format response
+            results = df[["cve_id", "prediction", "risk_probability"]].to_dict(
+                orient="records"
+            )
 
             return Response(
-                {"rows_received": len(df),
-                 "success": "File parsed successfully"},
+                {
+                    "success": True,
+                    "total_items": len(results),
+                    "results": results,
+                },
                 status=status.HTTP_200_OK
             )
 
