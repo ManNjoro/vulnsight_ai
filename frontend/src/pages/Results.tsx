@@ -7,6 +7,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import DataTable from '../components/DataTable';
 import FolderIcon from '@mui/icons-material/Folder';
+import type { PredictionResult } from '../types/types';
 
 const Results = () => {
     const [filters, setFilters] = useState({
@@ -20,44 +21,20 @@ const Results = () => {
     error,
     paginationModel,
     setPaginationModel,
-  } = useFetchTableData({
+  } = useFetchTableData<PredictionResult>({
     queryKey: "prediction-results",
     fetchFunc: vulnerabilityApi.getPredictionResults,
     params: filters,
   });
 
   const columns = [
-    {
-        field: 'cve_id',
-        headerName: 'CVE ID',
-        flex: 1
-    },
-    {
-        field: 'prediction',
-        headerName: 'Prediction',
-        flex: 1
-    },
-    {
-        field: 'prediction',
-        headerName: 'Prediction',
-        flex: 1
-    },
-    {
-        field: 'risk_probability',
-        headerName: 'Risk Probability',
-        flex: 1
-    },
-    {
-        field: 'uploaded_at',
-        headerName: 'Date uploaded',
-        flex: 1
-    },
-    {
-        field: 'original_filename',
-        headerName: 'Original Filename',
-        flex: 1
-    },
-  ]
+  { field: "cve_id", headerName: "CVE ID", flex: 1 },
+  { field: "prediction", headerName: "Prediction", flex: 1 },
+  { field: "risk_probability", headerName: "Risk Probability", flex: 1 },
+  { field: "uploaded_at", headerName: "Date Uploaded", flex: 1 },
+  { field: "original_filename", headerName: "Original Filename", flex: 1 },
+];
+
 
   const handleClearFilters = () => {
     setFilters({
@@ -66,7 +43,7 @@ const Results = () => {
     setPaginationModel(prev => ({ ...prev, page: 0 }));
   };
 
-  const handleSearchChange = (event) => {
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilters(prev => ({
       ...prev,
       search: event.target.value

@@ -1,8 +1,19 @@
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, type GridCallbackDetails, type GridColDef, type GridPaginationModel } from '@mui/x-data-grid'
 import { transformColumns } from '../utils/helpers'
+import type { PredictionResult } from '../types/types';
 
+interface DataTableProps {
+  rows: PredictionResult[];
+  columns: GridColDef[];
+  loading: boolean;
+  rowCount: number;
+  paginationModel: GridPaginationModel;
+  onPaginationModelChange: (model: GridPaginationModel, details: GridCallbackDetails<"pagination">) => void;
+  pageSizeOptions?: number[];
+  paginationMode: "client"| "server"
+}
 
-const DataTable = ({rows, columns, loading, rowCount,pageSizeOptions=[10, 25, 50], paginationModel, onPaginationModelChange,styles, ...otherProps}) => {
+const DataTable = ({rows, columns, loading, rowCount,pageSizeOptions=[10, 25, 50], paginationModel, onPaginationModelChange, ...otherProps}: DataTableProps) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <DataGrid
@@ -53,7 +64,7 @@ const DataTable = ({rows, columns, loading, rowCount,pageSizeOptions=[10, 25, 50
             // fontWeight: 700,
           },
           paddingBottom: 3,
-                ...(styles ? styles : {}),
+               
               }}
             //   autoHeight
               disableRowSelectionOnClick

@@ -1,25 +1,25 @@
+// hooks/useFetchTableData.ts
 import { useQuery } from "@tanstack/react-query";
-import type { PaginatedResponse } from "../types/types";
 import { useState } from "react";
+import type { PaginatedResponse } from "../types/types";
 
-
-interface UseFetchTableProps {
+interface UseFetchTableProps<T> {
   queryKey: string;
-  fetchFunc: (params: URLSearchParams) => Promise<any>;
+  fetchFunc: (params: URLSearchParams) => Promise<{ data: PaginatedResponse<T> }>;
   params?: Record<string, any>;
 }
 
-const useFetchTableData = ({
+function useFetchTableData<T>({
   queryKey,
   fetchFunc,
   params = {},
-}: UseFetchTableProps) => {
+}: UseFetchTableProps<T>) {
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
   });
 
-  const { data, isLoading, isError, error } = useQuery({
+  const query = useQuery({
     queryKey: [queryKey, paginationModel.page, paginationModel.pageSize, params],
     queryFn: async () => {
       const page = paginationModel.page + 1;
@@ -28,24 +28,31 @@ const useFetchTableData = ({
         page: String(page),
         page_size: String(paginationModel.pageSize),
         ...Object.fromEntries(
-          Object.entries(params).filter(([_, v]) => v !== "" && v !== null)
+          Object.entries(params).filter(([_, v]) => v != null && v !== "")
         ),
       });
 
-      const res = await fetchFunc(queryParams);
-      return res.data as PaginatedResponse<any>;
+      const response = await fetchFunc(queryParams);
+      return response.data; // This is PaginatedResponse<T>
     },
     keepPreviousData: true,
-  });
+    // Explicitly tell React Query the data type
+  }) as {
+    data: PaginatedResponse<T> | undefined;
+    isLoading: boolean;
+    isError: boolean;
+    error: Error | null;
+    // ... other properties
+  };
 
   return {
-    data,
-    isLoading,
-    isError,
-    error,
+    data: query.data,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
     paginationModel,
     setPaginationModel,
   };
-};
+}
 
 export default useFetchTableData;
