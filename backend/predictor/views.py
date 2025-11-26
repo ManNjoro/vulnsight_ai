@@ -117,12 +117,13 @@ class DashboardSummaryView(APIView):
         )
 
         time_data = [
-            {
-                "date": localtime(d["day"]).strftime("%b %d"),
-                "count": d["count"]
-            }
-            for d in daily
-        ]
+    {
+        "date": d["day"].strftime("%b %d"),
+        "count": d["count"]
+    }
+    for d in daily
+]
+
 
         summary = {
             "total_predictions": total,

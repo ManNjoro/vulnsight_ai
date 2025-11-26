@@ -28,11 +28,22 @@ export interface SelectProps {
   onChange: (val: string) => void;
 }
 
+
+export interface RiskDistributionItem {
+  name: string;
+  value: number;
+}
+
+export interface PredictionTimeData {
+  date: string;
+  count: number;
+}
+
 export interface DashboardSummary {
   total_predictions: number;
   high_risk: number;
   low_risk: number;
   latest_upload: string | null;
-  risk_distribution: { name: string; value: number }[];
-  predictions_over_time: { date: string; count: number }[];
+  risk_distribution: RiskDistributionItem[];
+  predictions_over_time: PredictionTimeData[];
 }
