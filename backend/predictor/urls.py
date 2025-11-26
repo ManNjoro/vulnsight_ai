@@ -7,5 +7,6 @@ from . import views
 # router.register('predictions', views.prediction_results.as_view(), basename='predictions')
 
 urlpatterns = [
-    path('predictions/', views.PredictionResultsView.as_view())
+    path('predictions/', views.PredictionResultsView.as_view(), name='predictions'),
+    path("results/", views.PredictionListView.as_view(), name="results-list"),
 ]

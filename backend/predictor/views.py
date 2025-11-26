@@ -6,39 +6,79 @@ from rest_framework.views import APIView
 from .serializers import PredictionResultsSerializer
 from .predict import run_prediction
 from .pagination import ResultsPagination
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import ListAPIView
 
 # Create your views here.
 
 from .utils import parse_uploaded_file
 
+from .models import PredictionResult
+from .serializers import PredictionResultSerializer
+
 class PredictionResultsView(APIView):
     serializer_class = PredictionResultsSerializer
-    pagination_class = ResultsPagination
 
     def post(self, request):
         try:
-            serializer = self.serializer_class(data=request.data)
-            serializer.is_valid(raise_exception=True)
+            # Validate incoming file
+            upload_serializer = PredictionResultsSerializer(data=request.data)
+            upload_serializer.is_valid(raise_exception=True)
 
-            uploaded_file = serializer.validated_data["file"]
+            uploaded_file = upload_serializer.validated_data["file"]
 
+            # Parse uploaded CSV/XLSX
             df = parse_uploaded_file(uploaded_file)
 
+            # Run model inference
             preds, probs = run_prediction(df)
 
             df["prediction"] = preds
             df["risk_probability"] = probs
 
-            results = df[["cve_id", "prediction", "risk_probability"]].to_dict(
-                orient="records"
-            )
+            # Save each row to DB
+            filename = uploaded_file.name
 
-            # APPLY PAGINATION HERE
-            paginator = self.pagination_class()
-            paginated_page = paginator.paginate_queryset(results, request)
+            # saved_records = []
+            prediction_results = [
+                PredictionResult(
+                    cve_id=row["cve_id"],
+                    prediction=row["prediction"],
+                    risk_probability=row["risk_probability"],
+                    original_filename=filename
+                ) for _, row in df.iterrows()
+            ]
 
-            return paginator.get_paginated_response(paginated_page)
+            PredictionResult.objects.bulk_create(prediction_results)
+            # for _, row in df.iterrows():
+            #     obj = PredictionResult.objects.create(
+            #         cve_id=row["cve_id"],
+            #         prediction=row["prediction"],
+            #         risk_probability=row["risk_probability"],
+            #         original_filename=filename
+            #     )
+            #     saved_records.append(obj)
+
+            # Prepare response
+            # results = [
+            #     {
+            #         "cve_id": r.cve_id,
+            #         "prediction": r.prediction,
+            #         "risk_probability": r.risk_probability
+            #     }
+            #     for r in saved_records
+            # ]
+
+            return Response({
+                "success": True,
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
 
+
+class PredictionListView(ListAPIView):
+    queryset = PredictionResult.objects.all().order_by("-uploaded_at")
+    serializer_class = PredictionResultSerializer
+    pagination_class = ResultsPagination
