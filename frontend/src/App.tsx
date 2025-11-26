@@ -1,14 +1,21 @@
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
+import Dashboard from "./pages/Dashboard";
+import Upload from "./pages/Upload";
+import Results from "./pages/Results";
 
 function App() {
-
   return (
-    <>
-      <h1 className="text-3xl font-bold underline">
-    Hello world!
-  </h1>
-      </>
-  )
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/upload" element={<Upload />} />
+          <Route path="/results" element={<Results />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

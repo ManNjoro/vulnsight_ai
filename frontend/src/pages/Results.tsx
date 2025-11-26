@@ -130,7 +130,6 @@ const Results = () => {
           columns={columns}
           loading={isLoading}
           rowCount={data?.count || 0}
-          paginationMode="server"
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
        

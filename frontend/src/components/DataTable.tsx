@@ -10,7 +10,6 @@ interface DataTableProps {
   paginationModel: GridPaginationModel;
   onPaginationModelChange: (model: GridPaginationModel, details: GridCallbackDetails<"pagination">) => void;
   pageSizeOptions?: number[];
-  paginationMode: "client"| "server"
 }
 
 const DataTable = ({rows, columns, loading, rowCount,pageSizeOptions=[10, 25, 50], paginationModel, onPaginationModelChange, ...otherProps}: DataTableProps) => {
