@@ -1,13 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { useState } from "react";
+import type { PaginatedResponse } from "../types/types";
+import { useState } from "react";
 
-interface useFetchTableDataProps {
-    queryKey: string;
-    fetchFunc: () => void;
-    params: object
+
+interface UseFetchTableProps {
+  queryKey: string;
+  fetchFunc: (params: URLSearchParams) => Promise<any>;
+  params?: Record<string, any>;
 }
 
-const useFetchTableData = ({ queryKey, fetchFunc, params = {} }: useFetchTableDataProps) => {
+const useFetchTableData = ({
+  queryKey,
+  fetchFunc,
+  params = {},
+}: UseFetchTableProps) => {
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
@@ -16,23 +22,22 @@ const useFetchTableData = ({ queryKey, fetchFunc, params = {} }: useFetchTableDa
   const { data, isLoading, isError, error } = useQuery({
     queryKey: [queryKey, paginationModel.page, paginationModel.pageSize, params],
     queryFn: async () => {
-      const page = paginationModel.page + 1; // Convert to 1-based for API
+      const page = paginationModel.page + 1;
+
       const queryParams = new URLSearchParams({
-        page: page.toString(),
-        page_size: paginationModel.pageSize.toString(),
-        ...params,
+        page: String(page),
+        page_size: String(paginationModel.pageSize),
+        ...Object.fromEntries(
+          Object.entries(params).filter(([_, v]) => v !== "" && v !== null)
+        ),
       });
-      // Remove any undefined or null values
-      Object.keys(queryParams).forEach(key => {
-        if (queryParams[key] === undefined || queryParams[key] === null || queryParams[key] === '') {
-          delete queryParams[key];
-        }
-      });
+
       const res = await fetchFunc(queryParams);
-      return res.data;
+      return res.data as PaginatedResponse<any>;
     },
     keepPreviousData: true,
   });
+
   return {
     data,
     isLoading,
