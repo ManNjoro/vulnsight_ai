@@ -1,3 +1,4 @@
+
 export interface PredictionResult {
   id: number;
   cve_id: string;
@@ -12,4 +13,17 @@ export interface PaginatedResponse<T> {
   next: string | null;
   previous: string | null;
   results: T[];
+}
+
+export interface DropDownOptions {
+  label: string;
+  value: string;
+}
+
+export interface SelectProps {
+  options: DropDownOptions[];
+  label: string;
+  helperText: string;
+  value: string;
+  onChange: (val: string) => void;
 }

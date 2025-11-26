@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import useFetchTableData from "../hooks/useFetchTableData";
-import vulnerabilityApi from "../api/vulnerability";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import FolderIcon from "@mui/icons-material/Folder";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Button,
   Card,
@@ -9,17 +10,19 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import SearchIcon from "@mui/icons-material/Search";
-import DataTable from "../components/DataTable";
-import FolderIcon from "@mui/icons-material/Folder";
-import type { PredictionResult } from "../types/types";
 import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import React, { useState } from "react";
+import vulnerabilityApi from "../api/vulnerability";
+import DataTable from "../components/DataTable";
+import useFetchTableData from "../hooks/useFetchTableData";
+import type { PredictionResult } from "../types/types";
+import Select from "../components/Select";
+import { predictionOptions } from "../utils/dropDownData";
 
 const Results = () => {
   const [filters, setFilters] = useState({
     search: "",
+    prediction: "",
   });
 
   const {
@@ -45,7 +48,7 @@ const Results = () => {
         const val = params;
         if (val === 0) return "Safe";
         if (val === 1) return "Vulnerable";
-        return "Unknown"
+        return "Unknown";
       },
       renderCell: (params: GridRenderCellParams<PredictionResult, string>) => {
         const val = params.row.prediction;
@@ -65,7 +68,7 @@ const Results = () => {
       field: "uploaded_at",
       headerName: "Date Uploaded",
       flex: 1,
-      type: 'date',
+      type: "date",
       valueGetter: (params) => new Date(params),
       renderCell: (params) => {
         const date = new Date(params.row.uploaded_at);
@@ -83,8 +86,17 @@ const Results = () => {
 
   const handleClearFilters = () => {
     setFilters({
+      prediction: "",
       search: "",
     });
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
+  };
+
+  const handlePredictionStatusFilterChange = (val: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      prediction: val,
+    }));
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
   };
 
@@ -170,6 +182,15 @@ const Results = () => {
                 }}
                 className="w-full sm:w-64"
               />
+              <div className="min-w-[150px]">
+                <Select
+                  helperText=""
+                  label="Prediction"
+                  onChange={handlePredictionStatusFilterChange}
+                  options={predictionOptions}
+                  value={filters.prediction}
+                />
+              </div>
             </div>
           </div>
         </CardContent>
