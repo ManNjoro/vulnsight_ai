@@ -6,7 +6,7 @@ import type { PaginatedResponse } from "../types/types";
 interface UseFetchTableProps<T> {
   queryKey: string;
   fetchFunc: (params: URLSearchParams) => Promise<{ data: PaginatedResponse<T> }>;
-  params?: Record<string, any>;
+  params?: Record<string, string | number | boolean>;
 }
 
 function useFetchTableData<T>({
@@ -19,37 +19,32 @@ function useFetchTableData<T>({
     pageSize: 10,
   });
 
-  const query = useQuery({
+  const { data, isLoading, isError, error } = useQuery<PaginatedResponse<T>, Error>({
     queryKey: [queryKey, paginationModel.page, paginationModel.pageSize, params],
     queryFn: async () => {
       const page = paginationModel.page + 1;
 
-      const queryParams = new URLSearchParams({
+      const searchParams = new URLSearchParams({
         page: String(page),
         page_size: String(paginationModel.pageSize),
         ...Object.fromEntries(
-          Object.entries(params).filter(([_, v]) => v != null && v !== "")
+          Object.entries(params).filter(([, value]) => 
+            value != null && value !== ""
+          )
         ),
       });
 
-      const response = await fetchFunc(queryParams);
-      return response.data; // This is PaginatedResponse<T>
+      const response = await fetchFunc(searchParams);
+      return response.data;
     },
-    keepPreviousData: true,
-    // Explicitly tell React Query the data type
-  }) as {
-    data: PaginatedResponse<T> | undefined;
-    isLoading: boolean;
-    isError: boolean;
-    error: Error | null;
-    // ... other properties
-  };
+    placeholderData: (previousData) => previousData,
+  });
 
   return {
-    data: query.data,
-    isLoading: query.isLoading,
-    isError: query.isError,
-    error: query.error,
+    data,
+    isLoading,
+    isError,
+    error,
     paginationModel,
     setPaginationModel,
   };
