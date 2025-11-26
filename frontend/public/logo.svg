@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#0f172a" rx="80"/>
+
+  <!-- Shield Base -->
+  <path d="M256 80 L256 432 L100 400 L100 112 Z" fill="#1e293b"/>
+  <path d="M256 80 L412 112 L412 400 Z" fill="#334155"/>
+
+  <!-- Circuit Shield Icon -->
+  <g transform="translate(256,256) scale(6)">
+    <!-- Shield Outline -->
+    <path d="M0,-10 L-7,-3 L-7,5 L0,10 L7,5 L7,-3 Z" fill="none" stroke="#06b6d4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Inner Circuit Pattern -->
+    <circle cx="0" cy="0" r="3" fill="#06b6d4" opacity="0.9"/>
+    <circle cx="0" cy="0" r="5" fill="none" stroke="#06b6d4" stroke-width="0.8" opacity="0.6"/>
+    
+    <!-- Crosshair / Target -->
+    <circle cx="0" cy="0" r="1.5" fill="#fff"/>
+    <line x1="-4" y1="0" x2="4" y2="0" stroke="#06b6d4" stroke-width="0.8"/>
+    <line x1="0" y1="-4" x2="0" y2="4" stroke="#06b6d4" stroke-width="0.8"/>
+  </g>
+
+  <!-- "V" Symbol (Abstract Vulnerability Vision) -->
+  <path d="M180 140 L256 220 L332 140 L348 160 L256 280 L164 160 Z" fill="#06b6d4"/>
+  <path d="M180 140 L256 220 L332 140" fill="none" stroke="#0ea5e9" stroke-width="12" opacity="0.6"/>
+
+  <!-- Text: Vulnsight AI -->
+  <text x="256" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="800" fill="#e2e8f0" text-anchor="middle" letter-spacing="-1">
+    Vulnsight
+  </text>
+  <text x="256" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="800" fill="#06b6d4" text-anchor="middle" opacity="0.8">
+    AI
+  </text>
+  <text x="256" y="420" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="500" fill="#94a3b8" text-anchor="middle" letter-spacing="2">
+    EXPLOIT PREDICTION
+  </text>
+</svg>

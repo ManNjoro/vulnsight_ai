@@ -150,8 +150,30 @@ const Results = () => {
           </Button>
         </div>
       </div>
-
-      {/* Filters */}
+{!isLoading && data?.results?.length === 0 ? (
+        <Card className="mt-6">
+          <CardContent className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FolderIcon className="w-8 h-8 text-gray-400" />
+            </div>
+            <Typography variant="h6" className="text-secondary-900 mb-2">
+              No Results found
+            </Typography>
+            <Typography variant="body2" className="text-secondary-600 mb-4">
+              {hasActiveFilters
+                ? "No results match your current filters."
+                : "There are no results in the system yet."}
+            </Typography>
+            {hasActiveFilters && (
+              <Button onClick={handleClearFilters} variant="outlined">
+                Clear Filters
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )
+      :
+              <>
       <Card className="mb-6">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -191,7 +213,6 @@ const Results = () => {
           </div>
         </CardContent>
       </Card>
-
       {/* DataGrid */}
       <DataTable
         rows={data?.results || []}
@@ -201,30 +222,10 @@ const Results = () => {
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
       />
+              </>
+    }
 
-      {/* Empty State */}
-      {!isLoading && data?.results?.length === 0 && (
-        <Card className="mt-6">
-          <CardContent className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FolderIcon className="w-8 h-8 text-gray-400" />
-            </div>
-            <Typography variant="h6" className="text-secondary-900 mb-2">
-              No Results found
-            </Typography>
-            <Typography variant="body2" className="text-secondary-600 mb-4">
-              {hasActiveFilters
-                ? "No results match your current filters."
-                : "There are no results in the system yet."}
-            </Typography>
-            {hasActiveFilters && (
-              <Button onClick={handleClearFilters} variant="outlined">
-                Clear Filters
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      
     </div>
   );
 };

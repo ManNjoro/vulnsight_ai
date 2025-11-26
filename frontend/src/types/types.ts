@@ -1,3 +1,4 @@
+import type { TooltipProps } from "recharts";
 
 export interface PredictionResult {
   id: number;
@@ -28,7 +29,6 @@ export interface SelectProps {
   onChange: (val: string) => void;
 }
 
-
 export interface RiskDistributionItem {
   name: string;
   value: number;
@@ -47,3 +47,20 @@ export interface DashboardSummary {
   risk_distribution: RiskDistributionItem[];
   predictions_over_time: PredictionTimeData[];
 }
+export type TimeTooltipProps = TooltipProps<number, string> & {
+  payload?: { value?: number }[];
+  label?: string;
+};
+export interface PieEntry {
+  name?: string;
+  value?: number;
+  __total__?: number;
+}
+export type RDTooltipPayloadItem = {
+  payload?: RiskDistributionItem;
+  value?: number;
+};
+export type RDTooltipProps = TooltipProps<number, string> & {
+  payload?: RDTooltipPayloadItem[];
+  label?: string;
+};

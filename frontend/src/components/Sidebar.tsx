@@ -4,8 +4,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CloudUpload,
-  Dashboard,
-  Security
+  Dashboard
 } from "@mui/icons-material";
 import {
   Box,
@@ -69,37 +68,54 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       }}
     >
       <DrawerHeader>
-        {!isCollapsed && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Security color="primary" />
-            <Typography 
-              variant="h6" 
-              component="div" 
-              sx={{ 
-                fontWeight: 'bold',
-                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
-              }}
-            >
-              VulnSight AI
-            </Typography>
-          </Box>
-        )}
-        <IconButton 
-          onClick={onToggle}
-          size="small"
-          sx={{
-            backgroundColor: theme.palette.action.hover,
-            '&:hover': {
-              backgroundColor: theme.palette.action.selected,
-            }
-          }}
-        >
-          {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
-        </IconButton>
-      </DrawerHeader>
+  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, ml: isCollapsed ? 0 : 1 }}>
+    {/* Logo Icon – scales perfectly in both modes */}
+    <Box
+      component="img"
+      src="/logo.svg" 
+      alt="Vulnsight AI"
+      sx={{
+        width: isCollapsed ? 36 : 42,
+        height: isCollapsed ? 36 : 42,
+        borderRadius: 1.5,
+        p: 0.5,
+        bgcolor: isCollapsed ? 'transparent' : 'primary.dark',
+        opacity: isCollapsed ? 0.9 : 1,
+        transition: 'all 0.2s ease',
+      }}
+    />
+
+    {/* Text – only visible when expanded */}
+    {!isCollapsed && (
+      <Typography
+        variant="h6"
+        component="div"
+        sx={{
+          fontWeight: 800,
+          background: `linear-gradient(90deg, ${theme.palette.primary.main}, #06b6d4)`,
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          color: 'transparent',
+          letterSpacing: '-0.5px',
+        }}
+      >
+        Vulnsight AI
+      </Typography>
+    )}
+  </Box>
+
+  {/* Collapse Button */}
+  <IconButton
+    onClick={onToggle}
+    size="small"
+    sx={{
+      backgroundColor: theme.palette.action.hover,
+      '&:hover': { backgroundColor: theme.palette.action.selected },
+    }}
+  >
+    {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
+  </IconButton>
+</DrawerHeader>
 
       <Divider />
 
