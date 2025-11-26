@@ -5,7 +5,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 
 const Sidebar = () => {
   return (
-    <div className="h-screen w-64 bg-gray-900 text-white flex flex-col p-5 space-y-5">
+    <div className="min-h-full w-64 bg-gray-900 text-white flex flex-col p-5 space-y-5">
       <h1 className="text-2xl font-bold tracking-wide">VulnSight AI</h1>
 
       <nav className="flex flex-col space-y-4 mt-6">

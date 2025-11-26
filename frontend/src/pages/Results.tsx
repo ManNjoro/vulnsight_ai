@@ -1,16 +1,24 @@
-import React, { useState } from 'react'
-import useFetchTableData from '../hooks/useFetchTableData';
-import vulnerabilityApi from '../api/vulnerability';
-import { Button, Card, CardContent, InputAdornment, TextField, Typography } from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import SearchIcon from '@mui/icons-material/Search';
-import DataTable from '../components/DataTable';
-import FolderIcon from '@mui/icons-material/Folder';
-import type { PredictionResult } from '../types/types';
+import React, { useState } from "react";
+import useFetchTableData from "../hooks/useFetchTableData";
+import vulnerabilityApi from "../api/vulnerability";
+import {
+  Button,
+  Card,
+  CardContent,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import SearchIcon from "@mui/icons-material/Search";
+import DataTable from "../components/DataTable";
+import FolderIcon from "@mui/icons-material/Folder";
+import type { PredictionResult } from "../types/types";
+import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
 const Results = () => {
-    const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState({
     search: "",
   });
 
@@ -27,28 +35,65 @@ const Results = () => {
     params: filters,
   });
 
-  const columns = [
-  { field: "cve_id", headerName: "CVE ID", flex: 1 },
-  { field: "prediction", headerName: "Prediction", flex: 1 },
-  { field: "risk_probability", headerName: "Risk Probability", flex: 1 },
-  { field: "uploaded_at", headerName: "Date Uploaded", flex: 1 },
-  { field: "original_filename", headerName: "Original Filename", flex: 1 },
-];
-
+  const columns: GridColDef<PredictionResult>[] = [
+    { field: "cve_id", headerName: "CVE ID", flex: 1 },
+    {
+      field: "prediction",
+      headerName: "Prediction",
+      flex: 1,
+      valueGetter: (params) => {
+        const val = params;
+        if (val === 0) return "Safe";
+        if (val === 1) return "Vulnerable";
+        return "Unknown"
+      },
+      renderCell: (params: GridRenderCellParams<PredictionResult, string>) => {
+        const val = params.row.prediction;
+        if (val === 0) return "Safe";
+        if (val === 1) return "Vulnerable";
+        return "Unknown";
+      },
+    },
+    {
+      field: "risk_probability",
+      headerName: "Risk Probability",
+      flex: 1,
+      renderCell: (params) =>
+        `${(params.row.risk_probability * 100).toFixed(2)}%`,
+    },
+    {
+      field: "uploaded_at",
+      headerName: "Date Uploaded",
+      flex: 1,
+      type: 'date',
+      valueGetter: (params) => new Date(params),
+      renderCell: (params) => {
+        const date = new Date(params.row.uploaded_at);
+        return date.toLocaleString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        });
+      },
+    },
+    { field: "original_filename", headerName: "Original Filename", flex: 1 },
+  ];
 
   const handleClearFilters = () => {
     setFilters({
       search: "",
     });
-    setPaginationModel(prev => ({ ...prev, page: 0 }));
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      search: event.target.value
+      search: event.target.value,
     }));
-    setPaginationModel(prev => ({ ...prev, page: 0 }));
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
   };
 
   const hasActiveFilters = filters.search;
@@ -57,10 +102,12 @@ const Results = () => {
     return (
       <div className="max-w-7xl mx-auto py-8 px-4">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">Error loading payments: {error?.message}</p>
-          <Button 
-            onClick={() => window.location.reload()} 
-            variant='outlined'
+          <p className="text-red-800">
+            Error loading results: {error?.message}
+          </p>
+          <Button
+            onClick={() => window.location.reload()}
+            variant="outlined"
             className="mt-4"
             startIcon={<RefreshIcon className="w-4 h-4 mr-2" />}
           >
@@ -75,15 +122,19 @@ const Results = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900">Prediction Results</h1>
+          <h1 className="text-3xl font-bold text-secondary-900">
+            Prediction Results
+          </h1>
           <p className="text-secondary-600 mt-1">
-            {data ? `Total: ${data.count} payments` : 'Monitor and manage payment transactions'}
+            {data
+              ? `Total: ${data.count} rows`
+              : "Monitor and manage predictions"}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
-          <Button 
+          <Button
             onClick={handleClearFilters}
-            variant='outlined'
+            variant="outlined"
             disabled={!hasActiveFilters}
             startIcon={<RefreshIcon className="w-4 h-4 mr-2" />}
           >
@@ -91,7 +142,6 @@ const Results = () => {
           </Button>
         </div>
       </div>
-      
 
       {/* Filters */}
       <Card className="mb-6">
@@ -109,32 +159,31 @@ const Results = () => {
                 placeholder="Search CVE ID..."
                 value={filters.search}
                 onChange={handleSearchChange}
-                slotProps={{input:{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon className="w-4 h-4 text-gray-400" />
-                    </InputAdornment>
-                  ),
-                }}}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon className="w-4 h-4 text-gray-400" />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
                 className="w-full sm:w-64"
               />
-              
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* DataGrid */}
-        <DataTable
-          rows={data?.results || []}
-          columns={columns}
-          loading={isLoading}
-          rowCount={data?.count || 0}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-       
-          
-        />
+      <DataTable
+        rows={data?.results || []}
+        columns={columns}
+        loading={isLoading}
+        rowCount={data?.count || 0}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+      />
 
       {/* Empty State */}
       {!isLoading && data?.results?.length === 0 && (
@@ -147,16 +196,12 @@ const Results = () => {
               No Results found
             </Typography>
             <Typography variant="body2" className="text-secondary-600 mb-4">
-              {hasActiveFilters 
-                ? 'No results match your current filters.'
-                : 'There are no results in the system yet.'
-              }
+              {hasActiveFilters
+                ? "No results match your current filters."
+                : "There are no results in the system yet."}
             </Typography>
             {hasActiveFilters && (
-              <Button 
-                onClick={handleClearFilters}
-                variant="outlined"
-              >
+              <Button onClick={handleClearFilters} variant="outlined">
                 Clear Filters
               </Button>
             )}
@@ -164,7 +209,7 @@ const Results = () => {
         </Card>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Results
+export default Results;
