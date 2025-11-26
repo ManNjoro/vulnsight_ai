@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .models import PredictionResult
 
 class PredictionResultsSerializer(serializers.Serializer):
     file = serializers.FileField()
@@ -27,3 +28,9 @@ class PredictionResultsSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['file']
+
+
+class PredictionResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PredictionResult
+        fields = "__all__"
