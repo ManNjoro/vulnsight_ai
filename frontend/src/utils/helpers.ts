@@ -1,3 +1,5 @@
+import type { GridColDef } from "@mui/x-data-grid";
+
 export function titleCase(str: string) {
   if(!str) return null
   const transformed = str.split("_").join(" ");
@@ -8,7 +10,7 @@ export function titleCase(str: string) {
     .join(" ");
 }
 
-export function transformColumns(columns) {
+export function transformColumns<T extends GridColDef>(columns: T[]): T[] {
   return columns.map((col) => ({
     ...col,
     headerName: titleCase(col.headerName ?? ""),
