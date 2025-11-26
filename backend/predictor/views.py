@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
-from .serializers import PredictionResultsSerializer
+from .serializers import PredictionResultsSerializer, DashboardSummarySerializer
 from .predict import run_prediction
 from .pagination import ResultsPagination
 from rest_framework.pagination import PageNumberPagination
@@ -11,6 +11,8 @@ from rest_framework.generics import ListAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .filters import PredictionResultsFilter
+from django.db.models import Count
+from django.utils.timezone import localtime
 
 # Create your views here.
 
@@ -88,3 +90,48 @@ class PredictionListView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['cve_id', 'original_filename']
     filterset_class = PredictionResultsFilter
+
+class DashboardSummaryView(APIView):
+
+    def get(self, request):
+        qs = PredictionResult.objects.all().order_by("-uploaded_at")
+
+        total = qs.count()
+        high_risk = qs.filter(prediction=1).count()
+        low_risk = qs.filter(prediction=0).count()
+
+        latest = qs.first().uploaded_at if qs.exists() else None
+
+        # Risk distribution
+        risk_dist = [
+            {"name": "High Risk", "value": high_risk},
+            {"name": "Low Risk", "value": low_risk},
+        ]
+
+        # Predictions over time (group by day)
+        daily = (
+            qs.extra({"day": "date(uploaded_at)"})
+              .values("day")
+              .annotate(count=Count("id"))
+              .order_by("day")
+        )
+
+        time_data = [
+            {
+                "date": localtime(d["day"]).strftime("%b %d"),
+                "count": d["count"]
+            }
+            for d in daily
+        ]
+
+        summary = {
+            "total_predictions": total,
+            "high_risk": high_risk,
+            "low_risk": low_risk,
+            "latest_upload": latest,
+            "risk_distribution": risk_dist,
+            "predictions_over_time": time_data,
+        }
+
+        serializer = DashboardSummarySerializer(summary)
+        return Response(serializer.data, status=status.HTTP_200_OK)

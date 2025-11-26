@@ -9,4 +9,6 @@ from . import views
 urlpatterns = [
     path('predictions/', views.PredictionResultsView.as_view(), name='predictions'),
     path("results/", views.PredictionListView.as_view(), name="results-list"),
+    path("dashboard/summary/", views.DashboardSummaryView.as_view(), name="dashboard-summary"),
+
 ]

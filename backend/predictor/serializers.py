@@ -34,3 +34,11 @@ class PredictionResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = PredictionResult
         fields = "__all__"
+
+class DashboardSummarySerializer(serializers.Serializer):
+    total_predictions = serializers.IntegerField()
+    high_risk = serializers.IntegerField()
+    low_risk = serializers.IntegerField()
+    latest_upload = serializers.DateTimeField(allow_null=True)
+    risk_distribution = serializers.ListField()
+    predictions_over_time = serializers.ListField()

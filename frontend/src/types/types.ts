@@ -27,3 +27,12 @@ export interface SelectProps {
   value: string;
   onChange: (val: string) => void;
 }
+
+export interface DashboardSummary {
+  total_predictions: number;
+  high_risk: number;
+  low_risk: number;
+  latest_upload: string | null;
+  risk_distribution: { name: string; value: number }[];
+  predictions_over_time: { date: string; count: number }[];
+}

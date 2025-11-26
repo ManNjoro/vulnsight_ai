@@ -14,6 +14,7 @@ import { CloudUpload, Description, CheckCircle } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import vulnerabilityApi from "../api/vulnerability";
 import { useNavigate } from "react-router-dom";
+import { isAxiosError } from "axios";
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -108,11 +109,15 @@ const Upload = () => {
         navigate('/results');
       }
     } catch (error) {
+      if(isAxiosError(error))
+        return setError(error.response?.data?.error || "Upload failed")
       console.error(error);
       setError("Upload failed. Please try again.");
+    } finally{
+
+      setLoading(false);
     }
 
-    setLoading(false);
   };
 
   const handleZoneClick = () => {
