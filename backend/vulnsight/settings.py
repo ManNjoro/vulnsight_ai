@@ -147,6 +147,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+ALLOWED_HOSTS = ['17b553499407.ngrok-free.app', 'localhost']
 CORS_ALLOW_ALL_ORIGINS = True
 
 # Default primary key field type

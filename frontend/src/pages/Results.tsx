@@ -18,6 +18,7 @@ import useFetchTableData from "../hooks/useFetchTableData";
 import type { PredictionResult } from "../types/types";
 import Select from "../components/Select";
 import { predictionOptions } from "../utils/dropDownData";
+import StatusBadge from "../components/StatusBadge";
 
 const Results = () => {
   const [filters, setFilters] = useState({
@@ -50,12 +51,7 @@ const Results = () => {
         if (val === 1) return "Vulnerable";
         return "Unknown";
       },
-      renderCell: (params: GridRenderCellParams<PredictionResult, string>) => {
-        const val = params.row.prediction;
-        if (val === 0) return "Safe";
-        if (val === 1) return "Vulnerable";
-        return "Unknown";
-      },
+      renderCell: (params: GridRenderCellParams<PredictionResult, string>) => <StatusBadge status={String(params.row.prediction)}  />,
     },
     {
       field: "risk_probability",
@@ -108,7 +104,7 @@ const Results = () => {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
   };
 
-  const hasActiveFilters = filters.search;
+  const hasActiveFilters = filters.search || filters.prediction;
 
   if (isError) {
     return (
