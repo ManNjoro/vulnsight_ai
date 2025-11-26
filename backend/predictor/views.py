@@ -8,6 +8,9 @@ from .predict import run_prediction
 from .pagination import ResultsPagination
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from .filters import PredictionResultsFilter
 
 # Create your views here.
 
@@ -82,3 +85,6 @@ class PredictionListView(ListAPIView):
     queryset = PredictionResult.objects.all().order_by("-uploaded_at")
     serializer_class = PredictionResultSerializer
     pagination_class = ResultsPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['cve_id', 'original_filename']
+    filterset_class = PredictionResultsFilter
